@@ -4,65 +4,41 @@ import openpyxl
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 
-def generate_agenda_excel_from_url(mtgid: str, output_path: str = "generated_agenda.xlsx") -> str:
+def generate_agenda_excel_from_url(mtgid: str, template_path, output_path: str = "generated_agenda.xlsx") -> str:
     
     html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid=" + mtgid
     print(f"🔗 Fetching agenda from: {html_url}")
-    res = requests.get(html_url)
-    soup = BeautifulSoup(res.content, "html.parser")
+    try:
+        # Webページ取得
+        res = requests.get(html_url)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, "html.parser")
 
-    # 会議情報取得
-    header_table = soup.find("table", class_="tableCommon")
-    rows = header_table.find_all("tr")
-    mtg_info = rows[1].find_all("td")
-    date = mtg_info[0].text.strip()
-    title = mtg_info[1].text.strip()
-    venue = mtg_info[3].text.strip()
-    room = mtg_info[4].text.strip()
+        # Excelテンプレート読み込み
+        wb = openpyxl.load_workbook(template_path)
+        ws = wb.active
 
-    # ゲスト取得
-    guest = ""
-    for table in soup.find_all("table", class_="tableCommon"):
-        th = table.find("th")
-        if th and "Guests" in th.text:
-            guest_td = table.find("td")
-            guest = guest_td.get_text(strip=True)
-            break
+        # ヘッダー情報取得
+        headers = soup.find_all("h2")
+        if len(headers) >= 2:
+            ws["D1"] = headers[0].text.strip()  # 例: The 185th meeting　2025/07/23（Wed）
+            ws["D2"] = headers[1].text.strip()  # 例: hybrid　St. Luke’s Garden Tower 15F
 
-    # アジェンダ表取得
-    agenda_table = soup.find("table", class_="tableCommon mainTbl")
-    agenda = []
-    for tr in agenda_table.find_all("tr")[1:]:
-        tds = tr.find_all("td")
-        if len(tds) >= 3:
-            role = tds[0].text.strip()
-            name = tds[1].text.strip()
-            detail = tds[2].text.strip()
-            title = tds[3].text.strip() if len(tds) > 3 else ""
-            agenda.append([role, name, detail, title])
+        # テーブルの取得（各セッション情報）
+        tables = soup.find_all("table")
+        start_row = 7  # 書き込み開始行
 
-    # Excel作成
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Agenda"
+        for table in tables:
+            rows = table.find_all("tr")
+            for r_idx, row in enumerate(rows):
+                tds = row.find_all("td")
+                for c_idx, cell in enumerate(tds):
+                    text = cell.text.strip()
+                    ws.cell(row=start_row + r_idx, column=2 + c_idx).value = text
+            start_row += len(rows) + 1  # 1行空けて次のセクションへ
 
-    ws.append(["Meeting Date", date])
-    ws.append(["Meeting Title", title])
-    ws.append(["Venue", venue])
-    ws.append(["Room", room])
-    ws.append(["Guests", guest])
-    ws.append([])
-    ws.append(["Role", "Name", "Details", "Speech Title"])
-
-    for row in agenda:
-        ws.append(row)
-
-    for col in range(1, 5):
-        col_letter = get_column_letter(col)
-        ws.column_dimensions[col_letter].width = 30
-        for cell in ws[col_letter]:
-            cell.alignment = Alignment(wrap_text=True, vertical="top")
-
-    wb.save(output_path)
-    print(f"✅ Saved Excel to: {output_path}")
-    return output_path
+        wb.save(output_path)
+        print(f"✅ Saved Excel to: {output_path}")
+        return output_path
+        
+    #return output_path
