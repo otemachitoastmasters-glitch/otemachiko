@@ -1,45 +1,50 @@
-from bs4 import BeautifulSoup
 import requests
-import openpyxl
-from openpyxl.styles import Alignment
+from bs4 import BeautifulSoup
+from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
+import datetime
 
-def generate_agenda_excel_from_url(mtgid: str, template_path, output_path: str = "generated_agenda.xlsx") -> str:
+def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
     
     html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid=" + mtgid
     print(f"🔗 Fetching agenda from: {html_url}")
-    try:
-        # Webページ取得
-        res = requests.get(html_url)
-        res.raise_for_status()
-        soup = BeautifulSoup(res.text, "html.parser")
+    res = requests.get(html_url)
+    soup = BeautifulSoup(res.content, "html.parser")
 
-        # Excelテンプレート読み込み
-        wb = openpyxl.load_workbook(template_path)
-        ws = wb.active
+    # 日付・タイトル取得
+    meeting_title = soup.find("div", class_="agendaTitle").text.strip()
+    meeting_datetime = soup.find("div", class_="agendaDatetime").text.strip()
 
-        # ヘッダー情報取得
-        headers = soup.find_all("h2")
-        if len(headers) >= 2:
-            ws["D1"] = headers[0].text.strip()  # 例: The 185th meeting　2025/07/23（Wed）
-            ws["D2"] = headers[1].text.strip()  # 例: hybrid　St. Luke’s Garden Tower 15F
+    # スピーカー情報取得（仮：テーブル例）
+    rows = soup.select("table.tableNormal tbody tr")
 
-        # テーブルの取得（各セッション情報）
-        tables = soup.find_all("table")
-        start_row = 7  # 書き込み開始行
+    # Excelテンプレートを読み込み
+    wb = load_workbook(template_path)
+    ws = wb.active
 
-        for table in tables:
-            rows = table.find_all("tr")
-            for r_idx, row in enumerate(rows):
-                tds = row.find_all("td")
-                for c_idx, cell in enumerate(tds):
-                    text = cell.text.strip()
-                    ws.cell(row=start_row + r_idx, column=2 + c_idx).value = text
-            start_row += len(rows) + 1  # 1行空けて次のセクションへ
+    # 💡 すべての結合セルを解除
+    if ws.merged_cells.ranges:
+        print("⚠️ Unmerging cells...")
+    for merged_range in list(ws.merged_cells.ranges):
+        ws.unmerge_cells(str(merged_range))
 
-        wb.save(output_path)
-        print(f"✅ Saved Excel to: {output_path}")
-        return output_path
-        
-    except Exception as e:
-        return f"❌ エラー: {e}"
+    # 🔄 タイトル・日時を書き込む（例：A2セル想定）
+    ws["A2"] = f"{meeting_title}　{meeting_datetime}"
+
+    # 💡 テーブル情報を反映（ここはデモ用：本番は項目に応じて座標調整要）
+    start_row = 10  # 実際の開始位置に合わせて調整
+    for i, row in enumerate(rows):
+        cols = row.find_all("td")
+        if len(cols) >= 2:
+            time = cols[0].text.strip()
+            role = cols[1].text.strip()
+            member = cols[2].text.strip() if len(cols) >= 3 else ""
+            # 書き込む位置を調整（例：列B、C、D）
+            ws.cell(row=start_row + i, column=2).value = time
+            ws.cell(row=start_row + i, column=3).value = role
+            ws.cell(row=start_row + i, column=4).value = member
+
+    # 保存
+    wb.save(output_path)
+    print(f"✅ Saved Excel to: {output_path}")
+    return output_path
