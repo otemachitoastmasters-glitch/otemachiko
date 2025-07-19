@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/generate/")
 def generate_agenda():
-    url = request.args.get("mtgid")
+    mtgid = request.args.get("mtgid")
     if not mtgid:
         return "Missing mtgid parameter", 400
 
