@@ -61,4 +61,4 @@ def generate_agenda_excel_from_url(html_url: str, output_path: str = "generated_
             cell.alignment = Alignment(wrap_text=True, vertical="top")
 
     wb.save(output_path)
-    return output_pathf
+    return output_path
