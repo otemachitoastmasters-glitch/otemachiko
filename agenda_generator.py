@@ -41,4 +41,5 @@ def generate_agenda_excel_from_url(mtgid: str, template_path, output_path: str =
         print(f"✅ Saved Excel to: {output_path}")
         return output_path
         
-    #return output_path
+    except Exception as e:
+        return f"❌ エラー: {e}"
