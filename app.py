@@ -6,12 +6,12 @@ app = Flask(__name__)
 
 @app.route("/generate/")
 def generate_agenda():
-    url = request.args.get("url")
-    if not url:
-        return "Missing URL parameter", 400
+    url = request.args.get("mtgid")
+    if not mtgid:
+        return "Missing mtgid parameter", 400
 
-    print(f"🔗 Fetching agenda from: {url}")
-    output_path = generate_agenda_excel_from_url(url)
+    print(f"🔗 Fetching agenda from: {mtgid}")
+    output_path = generate_agenda_excel_from_url(mtgid)
     print(f"✅ Saved Excel to: {output_path}")
 
     # ✅ ダウンロードさせるレスポンス
