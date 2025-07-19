@@ -89,9 +89,9 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     ws["E29"] = f"「{speech_title_map['Speech3']}"
     ws["I29"] = f"{speech_path_map['Speech3']}"
     ws["I30"] = f"{role_name_map['Speech3']}"
-    ws["E31"] = f"「{speech_title_map['Speech4']}"
-    ws["I31"] = f"{speech_path_map['Speech4']}"
-    ws["I32"] = f"{role_name_map['Speech4']}"
+    ws["E31"] = f"「{speech_title_map.get('Speech4', '')}"
+    ws["I31"] = f"{speech_path_map.get('Speech4','')}"
+    ws["I32"] = f"{role_name_map.get('Speech4','')}"
     
     # GE, Evaluators
     ws["I37"] = f"{role_name_map['General Evaluator']}"
@@ -101,8 +101,8 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     ws["I39"] = f"{role_name_map['Evaluator2']}"
     ws["E40"] = f"{evaluator_map['Evaluator3']}"
     ws["I40"] = f"{role_name_map['Evaluator3']}"
-    ws["E41"] = f"{evaluator_map['Evaluator4']}"
-    ws["I41"] = f"{role_name_map['Evaluator4']}"
+    ws["E41"] = f"{evaluator_map.get('Evaluator4','')}"
+    ws["I41"] = f"{role_name_map.get('Evaluator4','')}"
     # WOE, Ah-Counter, Grammarian report
     ws["I43"] = f"{role_name_map['Word of the Evening']}"
     ws["I44"] = f"{role_name_map['Ah-Counter']}"
