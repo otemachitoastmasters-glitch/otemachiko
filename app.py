@@ -5,7 +5,6 @@ app = Flask(__name__)
 
 @app.route("/generate/", methods=["GET"])
 
-@app.route("/generate/", methods=["GET"])
 def generate_agenda():
     url = request.args.get("url")
     if not url:
