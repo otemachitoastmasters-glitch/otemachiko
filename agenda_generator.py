@@ -34,7 +34,7 @@ def generate_agenda_excel_from_url(mtgid: str, output_path: str = "generated_age
     agenda = []
     for tr in agenda_table.find_all("tr")[1:]:
         tds = tr.find_all("td")
-        if len(tds) >= 4:
+        if len(tds) >= 3:
             role = tds[0].text.strip()
             name = tds[1].text.strip()
             detail = tds[2].text.strip()
