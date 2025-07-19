@@ -2,3 +2,4 @@ flask
 requests
 openpyxl
 bs4
+gunicorn
