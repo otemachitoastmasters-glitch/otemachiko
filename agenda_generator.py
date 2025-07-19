@@ -19,10 +19,10 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     title = mtg_info[1].text
     venue = mtg_info[3].text.strip()
     room = mtg_info[4].text.strip()
-    # 日付・タイトル取得
+    
     meeting_title = title
     meeting_datetime = date
-
+    
     # ゲスト取得
     guest = ""
     for table in soup.find_all("table", class_="tableCommon"):
@@ -36,6 +36,9 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     agenda_table = soup.find("table", class_="tableCommon mainTbl")
     agenda = []
     role_name_map = {}
+    evaluator_map = {}
+    speech_path_map = {}
+    speech_title_map = {}
     for tr in agenda_table.find_all("tr")[1:]:
         tds = tr.find_all("td")
         if len(tds) >= 3:
@@ -45,17 +48,13 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
             title = tds[3].text.strip() if len(tds) > 3 else ""
             agenda.append([role, name, detail, title])
             role_name_map[role] = name
-
-    # Excelテンプレートを読み込み
-    wb = load_workbook(template_path)
-    ws = wb.active
-
-    # 💡 すべての結合セルを解除
-    if ws.merged_cells.ranges:
-        print("⚠️ Unmerging cells...")
-    for merged_range in list(ws.merged_cells.ranges):
-        ws.unmerge_cells(str(merged_range))
-
+            if "Speech" in role:
+                speech_path_map[role] = detail.split("\n")[-2] if "\n" in detail else ""
+                speech_title_map[role] = title
+    
+            if "Evaluator" in role:
+                evaluator_map[role] = detail
+            
     # Excelテンプレートを読み込み
     wb = load_workbook("meeting_agenda_template.xlsx")
     ws = wb.active
@@ -76,26 +75,41 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     ws["I10"] = f"{role_name_map['Word of the Evening']}"
     ws["I11"] = f"{role_name_map['Ah-Counter']}"
     ws["I12"] = f"{role_name_map['Grammarian']}"
-    ws["I13"] = f"{role_name_map['PC Manager (Vote Counter)']}"
+    ws["I13"] = f"{role_name_map['Timer']}"
+    ws["I14"] = f"{role_name_map['PC Manager (Vote Counter)']}"
     
     # Table Topic, Prepared Speech
     ws["I16"] = f"{role_name_map['Table Topics Master']}"
+    ws["E25"] = f"「{speech_title_map['Speech1']}"
+    ws["I25"] = f"{speech_path_map['Speech1']}"
     ws["I26"] = f"{role_name_map['Speech1']}"
+    ws["E27"] = f"「{speech_title_map['Speech2']}"
+    ws["I27"] = f"{speech_path_map['Speech2']}"
     ws["I28"] = f"{role_name_map['Speech2']}"
+    ws["E29"] = f"「{speech_title_map['Speech3']}"
+    ws["I29"] = f"{speech_path_map['Speech3']}"
     ws["I30"] = f"{role_name_map['Speech3']}"
+    ws["E31"] = f"「{speech_title_map['Speech4']}"
+    ws["I31"] = f"{speech_path_map['Speech4']}"
+    ws["I32"] = f"{role_name_map['Speech4']}"
     
     # GE, Evaluators
     ws["I37"] = f"{role_name_map['General Evaluator']}"
+    ws["E38"] = f"{evaluator_map['Evaluator1']}"
     ws["I38"] = f"{role_name_map['Evaluator1']}"
+    ws["E39"] = f"{evaluator_map['Evaluator2']}"
     ws["I39"] = f"{role_name_map['Evaluator2']}"
+    ws["E40"] = f"{evaluator_map['Evaluator3']}"
     ws["I40"] = f"{role_name_map['Evaluator3']}"
-    
+    ws["E41"] = f"{evaluator_map['Evaluator4']}"
+    ws["I41"] = f"{role_name_map['Evaluator4']}"
     # WOE, Ah-Counter, Grammarian report
-    ws["I42"] = f"{role_name_map['Word of the Evening']}"
-    ws["I43"] = f"{role_name_map['Ah-Counter']}"
-    ws["I44"] = f"{role_name_map['Grammarian']}"
-
+    ws["I43"] = f"{role_name_map['Word of the Evening']}"
+    ws["I44"] = f"{role_name_map['Ah-Counter']}"
+    ws["I45"] = f"{role_name_map['Grammarian']}"
+    
     # 保存
+    output_path = meeting_title + "_agenda.xlsx"
     wb.save(output_path)
     print(f"✅ Saved Excel to: {output_path}")
     return output_path
