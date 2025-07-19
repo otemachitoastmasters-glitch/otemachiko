@@ -1,19 +1,16 @@
-from flask import Flask
+from flask import Flask, request, send_file
+from agenda_generator import generate_agenda_excel_from_url
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello():
-    return "Hello from Render!"
-    
-@app.route("/generate", methods=["POST"])
+@app.route("/generate", methods=["GET"])
 def generate():
-    data = request.get_json()
-    html_url = data.get("html_url")
-    # アジェンダExcel/PDFを生成（事前に定義）
-    filepath = generate_agenda_excel_from_url(html_url)
-    public_url = upload_to_gdrive_or_s3(filepath)
-    return jsonify({"file": public_url})
+    url = request.args.get("url")
+    if not url:
+        return "Missing 'url' parameter", 400
+
+    output_path = generate_agenda_excel_from_url(url)
+    return send_file(output_path, as_attachment=True)
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
