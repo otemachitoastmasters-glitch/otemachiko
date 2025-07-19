@@ -11,7 +11,7 @@ def generate_agenda():
         return "Missing mtgid parameter", 400
 
     print(f"🔗 Fetching agenda from: {mtgid}")
-    output_path = generate_agenda_excel_from_url(mtgid)
+    output_path = generate_agenda_excel_from_url(mtgid, "meeting_agenda_template.xlsx")
     print(f"✅ Saved Excel to: {output_path}")
 
     # ✅ ダウンロードさせるレスポンス
