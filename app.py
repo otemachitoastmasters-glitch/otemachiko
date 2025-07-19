@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from your_module import generate_agenda_excel_from_url  # 関数のあるファイル名に置き換えてください
+from agenda_generator import generate_agenda_excel_from_url  # 関数のあるファイル名に置き換えてください
 
 app = Flask(__name__)
 
