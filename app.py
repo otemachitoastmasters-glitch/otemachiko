@@ -3,14 +3,18 @@ from agenda_generator import generate_agenda_excel_from_url
 
 app = Flask(__name__)
 
-@app.route("/generate", methods=["GET"])
+@app.route("/generate", methods=["POST"])
 def generate():
-    url = request.args.get("url")
-    if not url:
-        return "Missing 'url' parameter", 400
+    try:
+        print("✅ Request received")
+        print(request.json)
 
-    output_path = generate_agenda_excel_from_url(url)
-    return send_file(output_path, as_attachment=True)
+        # 本処理
+        return "done"
+
+    except Exception as e:
+        print("❌ Error:", e)
+        return str(e), 500
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
