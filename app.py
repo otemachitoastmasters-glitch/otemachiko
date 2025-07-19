@@ -4,17 +4,19 @@ from agenda_generator import generate_agenda_excel_from_url  # 関数のある�
 app = Flask(__name__)
 
 @app.route("/generate/", methods=["GET"])
-def generate():
+
+@app.route("/generate/", methods=["GET"])
+def generate_agenda():
     url = request.args.get("url")
     if not url:
-        return jsonify({"error": "Missing URL"}), 400
-
+        return "Missing URL", 400
     try:
-        # アジェンダExcelを生成して、ファイルのURLを返す想定
-        file_url = generate_agenda_excel_from_url(url)
-        return jsonify({"message": "success", "file_url": file_url})
+        output_path = generate_agenda_excel_from_url(url)
+        return send_file(output_path, as_attachment=True)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        traceback.print_exc()
+        return f"Error: {str(e)}", 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
