@@ -4,8 +4,9 @@ import openpyxl
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 
-def generate_agenda_excel_from_url(html_url: str, output_path: str = "generated_agenda.xlsx") -> str:
+def generate_agenda_excel_from_url(mtgid: str, output_path: str = "generated_agenda.xlsx") -> str:
     
+    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid=" + mtgid
     print(f"🔗 Fetching agenda from: {html_url}")
     res = requests.get(html_url)
     soup = BeautifulSoup(res.content, "html.parser")
