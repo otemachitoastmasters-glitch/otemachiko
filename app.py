@@ -10,7 +10,12 @@ def generate():
         print(request.json)
 
         # 本処理
-        return "done"
+        url = request.args.get("url")
+        if not url:
+            return "Missing 'url' parameter", 400
+
+        output_path = generate_agenda_excel_from_url(url)
+        return send_file(output_path, as_attachment=True)
 
     except Exception as e:
         print("❌ Error:", e)
