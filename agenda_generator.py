@@ -38,7 +38,7 @@ def generate_agenda_excel_from_url(mtgid: str, output_path: str = "generated_age
             role = tds[0].text.strip()
             name = tds[1].text.strip()
             detail = tds[2].text.strip()
-            title = tds[3].text.strip()
+            title = tds[3].text.strip() if len(tds) > 3 else ""
             agenda.append([role, name, detail, title])
 
     # Excel作成
