@@ -5,6 +5,8 @@ from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 
 def generate_agenda_excel_from_url(html_url: str, output_path: str = "generated_agenda.xlsx") -> str:
+    
+    print(f"🔗 Fetching agenda from: {html_url}")
     res = requests.get(html_url)
     soup = BeautifulSoup(res.content, "html.parser")
 
@@ -61,4 +63,5 @@ def generate_agenda_excel_from_url(html_url: str, output_path: str = "generated_
             cell.alignment = Alignment(wrap_text=True, vertical="top")
 
     wb.save(output_path)
+    print(f"✅ Saved Excel to: {output_path}")
     return output_path
