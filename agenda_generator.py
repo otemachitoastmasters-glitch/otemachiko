@@ -4,7 +4,22 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.drawing.image import Image
 import datetime
+import re
 
+def fetch_first_mtgid_by_showdetail(url="https://tmcsupport.coresv.com/otemachiko/"):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # すべての a タグを取得
+    for a_tag in soup.find_all("a", onclick=True):
+        onclick_value = a_tag["onclick"]
+        # showDetail(NUMBER) を抽出
+        match = re.search(r"showDetail\((\d+)\)", onclick_value)
+        if match:
+            return int(match.group(1))  # 最初に見つけた mtgid を返す
+
+    return None  # 見つからなかった場合
+    
 def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
