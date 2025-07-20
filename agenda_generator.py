@@ -46,7 +46,7 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
     
 def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
 
-    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid={mtgid}"
+    html_url = f"https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid={mtgid}"
     print(f"🔗 Fetching agenda from: {html_url}")
     res = requests.get(html_url)
     soup = BeautifulSoup(res.content, "html.parser")
