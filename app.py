@@ -7,8 +7,9 @@ app = Flask(__name__)
 @app.route("/generate/")
 def generate_agenda():
 
-    print(f"🔗 Fetching agenda ")
-    output_path = generate_agenda_excel_from_url("meeting_agenda_template.xlsx")
+    mtgid = fetch_latest_mtgid()
+    print(f"🔗 Fetching agenda of {mtgid}")
+    output_path = generate_agenda_excel_from_url(mtgid, "meeting_agenda_template.xlsx")
     print(f"✅ Saved Excel to: {output_path}")
 
     # ✅ ダウンロードさせるレスポンス
