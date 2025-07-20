@@ -4,4 +4,3 @@ openpyxl
 bs4
 gunicorn
 Pillow
-playwright
