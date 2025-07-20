@@ -7,6 +7,11 @@ from openpyxl.drawing.image import Image
 import datetime
 
 def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+    }
+    response = requests.get("https://tmcsupport.coresv.com/otemachiko/", headers=headers)
+    
     response = requests.get(base_url)
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -43,8 +48,8 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
                 latest_date = meeting_date
                 latest_mtgid = mtg_id
 
-    if latest_mtgid == None:
-        latest_mtgid = 77
+    //if latest_mtgid == None:
+    //    latest_mtgid = 77
         
     return latest_mtgid
     
