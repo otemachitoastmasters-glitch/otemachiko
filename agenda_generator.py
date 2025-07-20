@@ -6,7 +6,7 @@ from openpyxl.drawing.image import Image
 import datetime
 
 def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
-    response = requests.get(base_url)
+    response = requests.get("https://tmcsupport.coresv.com/otemachiko/")
     soup = BeautifulSoup(response.text, "html.parser")
 
     # 全てのtrを取得（1行目はthなのでスキップ）
