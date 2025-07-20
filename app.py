@@ -1,5 +1,5 @@
 from flask import Flask, request, send_file
-from agenda_generator import generate_agenda_excel_from_url 
+from agenda_generator import fetch_latest_mtgid, generate_agenda_excel_from_url 
 import os
 
 app = Flask(__name__)
