@@ -1,5 +1,5 @@
 from flask import Flask, request, send_file
-from agenda_generator import fetch_latest_mtgid, generate_agenda_excel_from_url 
+from agenda_generator import fetch_latest_mtgid, fetch_first_mtgid_by_showdetail, generate_agenda_excel_from_url 
 import os
 
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route("/generate/")
 def generate_agenda():
 
-    mtgid = fetch_latest_mtgid()
+    mtgid = fetch_first_mtgid_by_showdetail()
     print(f"🔗 Fetching agenda of {mtgid}")
     output_path = generate_agenda_excel_from_url(mtgid, "meeting_agenda_template.xlsx")
     print(f"✅ Saved Excel to: {output_path}")
