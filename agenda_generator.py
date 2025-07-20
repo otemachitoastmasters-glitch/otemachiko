@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.drawing.image import Image
 import datetime
 
 def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
@@ -59,6 +60,14 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
     wb = load_workbook("meeting_agenda_template.xlsx")
     ws = wb.active
     ws.title = "Agenda"
+
+    img = Image('toastmasters_logo.jpg')
+    # サイズの調整（ピクセル単位）
+    img.width = 150  # 幅(px)
+    img.height = 105  # 高さ(px)
+
+    # 貼り付け位置（例：A1セル）
+    ws.add_image(img, 'B1')  # A1セルに貼り付け（位置は調整してください）
     
     # 💡 すべての結合セルを解除
     if ws.merged_cells.ranges:
