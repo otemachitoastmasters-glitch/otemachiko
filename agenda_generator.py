@@ -83,6 +83,7 @@ def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template
     evaluator_map = {}
     speech_path_map = {}
     speech_title_map = {}
+    theme = ""
     for tr in agenda_table.find_all("tr")[1:]:
         tds = tr.find_all("td")
         if len(tds) >= 3:
@@ -92,6 +93,8 @@ def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template
             title = tds[3].text.strip() if len(tds) > 3 else ""
             agenda.append([role, name, detail, title])
             role_name_map[role] = name
+            if "Theme" in role:
+                theme = detail
             if "Speech" in role:
                 speech_path_map[role] = detail.split("\n")[-2] if "\n" in detail else ""
                 speech_title_map[role] = title
@@ -119,6 +122,7 @@ def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template
         ws.unmerge_cells(str(merged_range))
     
     # 🔄 タイトル・日時を書き込む（例：A2セル想定）
+    ws["F3"] = theme
     ws["K3"] = f"{meeting_title}　{meeting_datetime}"
     ws["K4"] = f"{venue} {room}"
     
