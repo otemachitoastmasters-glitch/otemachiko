@@ -43,7 +43,7 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
                 latest_date = meeting_date
                 latest_mtgid = mtg_id
 
-    if latest_mtgid = None:
+    if latest_mtgid == None:
         latest_mtgid = 77
         
     return latest_mtgid
