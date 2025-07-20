@@ -1,17 +1,23 @@
 import requests
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.drawing.image import Image
 import datetime
 
-def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
-    response = requests.get("https://tmcsupport.coresv.com/otemachiko/")
-    soup = BeautifulSoup(response.text, "html.parser")
+def fetch_latest_mtgid_with_playwright():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("https://tmcsupport.coresv.com/otemachiko/", timeout=60000)
+        page.wait_for_selector("table.tableCommon", timeout=10000)
+        html = page.content()
+        browser.close()
 
-    # 全てのtrを取得（1行目はthなのでスキップ）
+    soup = BeautifulSoup(html, "html.parser")
+
     rows = soup.select("table.tableCommon tr")[1:]
-
     latest_mtgid = None
     latest_date = None
 
@@ -20,7 +26,6 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
         if len(cols) < 2:
             continue
 
-        # 日付と onclick 属性取得
         date_text = cols[0].text.strip()
         link_tag = cols[1].find("a")
         if not link_tag or "onclick" not in link_tag.attrs:
@@ -33,10 +38,9 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
         try:
             mtg_id = int(onclick.split("showDetail(")[1].split(")")[0])
             meeting_date = datetime.strptime(date_text, "%Y/%m/%d")
-        except Exception as e:
+        except:
             continue
 
-        # 最も未来の会議日程（今日以降）を探す
         if meeting_date >= datetime.today():
             if latest_date is None or meeting_date < latest_date:
                 latest_date = meeting_date
