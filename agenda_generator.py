@@ -44,12 +44,9 @@ def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
 
     return latest_mtgid
     
-def generate_agenda_excel_from_url(template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
+def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
 
-    latest_id = fetch_latest_mtgid()
-    print(f"✅ 最新の mtgid は: {latest_id}")
-
-    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid={latest_id}"
+    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid={mtgid}"
     print(f"🔗 Fetching agenda from: {html_url}")
     res = requests.get(html_url)
     soup = BeautifulSoup(res.content, "html.parser")
