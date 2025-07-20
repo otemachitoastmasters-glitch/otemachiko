@@ -76,8 +76,8 @@ def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_tem
         ws.unmerge_cells(str(merged_range))
     
     # 🔄 タイトル・日時を書き込む（例：A2セル想定）
-    ws["J3"] = f"{meeting_title}　{meeting_datetime}"
-    ws["J4"] = f"{venue} {room}"
+    ws["K3"] = f"{meeting_title}　{meeting_datetime}"
+    ws["K4"] = f"{venue} {room}"
     
     # TMOE, WOE, Ah-Counter, Grammarian, PC manager
     ws["I9"] = f"{role_name_map['Toastmaster of the Evening']}"
