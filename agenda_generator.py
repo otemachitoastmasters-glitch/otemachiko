@@ -5,9 +5,51 @@ from openpyxl.utils import get_column_letter
 from openpyxl.drawing.image import Image
 import datetime
 
-def generate_agenda_excel_from_url(mtgid: str, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
+def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
+    response = requests.get(base_url)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # 全てのtrを取得（1行目はthなのでスキップ）
+    rows = soup.select("table.tableCommon tr")[1:]
+
+    latest_mtgid = None
+    latest_date = None
+
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) < 2:
+            continue
+
+        # 日付と onclick 属性取得
+        date_text = cols[0].text.strip()
+        link_tag = cols[1].find("a")
+        if not link_tag or "onclick" not in link_tag.attrs:
+            continue
+
+        onclick = link_tag["onclick"]
+        if "showDetail" not in onclick:
+            continue
+
+        try:
+            mtg_id = int(onclick.split("showDetail(")[1].split(")")[0])
+            meeting_date = datetime.strptime(date_text, "%Y/%m/%d")
+        except Exception as e:
+            continue
+
+        # 最も未来の会議日程（今日以降）を探す
+        if meeting_date >= datetime.today():
+            if latest_date is None or meeting_date < latest_date:
+                latest_date = meeting_date
+                latest_mtgid = mtg_id
+
+    return latest_mtgid
     
-    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid=" + mtgid
+def generate_agenda_excel_from_url(template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
+
+    latest_id = fetch_latest_mtgid()
+    print(f"✅ 最新の mtgid は: {latest_id}")
+
+    html_url = "https://tmcsupport.coresv.com/otemachiko/mtgDetailReadonly.php?mtgid={latest_id}"
     print(f"🔗 Fetching agenda from: {html_url}")
     res = requests.get(html_url)
     soup = BeautifulSoup(res.content, "html.parser")
