@@ -6,18 +6,13 @@ from openpyxl.utils import get_column_letter
 from openpyxl.drawing.image import Image
 import datetime
 
-def fetch_latest_mtgid_with_playwright():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("https://tmcsupport.coresv.com/otemachiko/", timeout=60000)
-        page.wait_for_selector("table.tableCommon", timeout=10000)
-        html = page.content()
-        browser.close()
+def fetch_latest_mtgid(base_url="https://tmcsupport.coresv.com/otemachiko/"):
+    response = requests.get(base_url)
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    soup = BeautifulSoup(html, "html.parser")
-
+    # 全てのtrを取得（1行目はthなのでスキップ）
     rows = soup.select("table.tableCommon tr")[1:]
+
     latest_mtgid = None
     latest_date = None
 
@@ -26,6 +21,7 @@ def fetch_latest_mtgid_with_playwright():
         if len(cols) < 2:
             continue
 
+        # 日付と onclick 属性取得
         date_text = cols[0].text.strip()
         link_tag = cols[1].find("a")
         if not link_tag or "onclick" not in link_tag.attrs:
@@ -38,14 +34,18 @@ def fetch_latest_mtgid_with_playwright():
         try:
             mtg_id = int(onclick.split("showDetail(")[1].split(")")[0])
             meeting_date = datetime.strptime(date_text, "%Y/%m/%d")
-        except:
+        except Exception as e:
             continue
 
+        # 最も未来の会議日程（今日以降）を探す
         if meeting_date >= datetime.today():
             if latest_date is None or meeting_date < latest_date:
                 latest_date = meeting_date
                 latest_mtgid = mtg_id
 
+    if latest_mtgid = None:
+        latest_mtgid = 77
+        
     return latest_mtgid
     
 def generate_agenda_excel_from_url(mtgid, template_path="meeting_agenda_template.xlsx", output_path: str = "generated_agenda.xlsx") -> str:
