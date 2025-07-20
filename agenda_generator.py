@@ -1,5 +1,4 @@
 import requests
-from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
