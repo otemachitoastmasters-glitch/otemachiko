@@ -210,53 +210,57 @@ def generate_agenda_excel_from_url(
     for rng in list(ws.merged_cells.ranges):
         ws.unmerge_cells(str(rng))
 
+    # --- ここから置き換え ---
+    
     # ヘッダ
     safe_set(ws, "F3", theme)
     safe_set(ws, "K3", f"{meeting_title}　{meeting_datetime}")
     safe_set(ws, "K4", f"{venue} {room}")
-
-    # 役割：存在しない場合は空でOK
+    
+    # 役割
     safe_set(ws, "I9",  role_name_map.get("Toastmaster of the Evening"))
     safe_set(ws, "I10", role_name_map.get("Word of the Evening"))
     safe_set(ws, "I11", role_name_map.get("Ah-Counter"))
     safe_set(ws, "I12", role_name_map.get("Grammarian"))
     safe_set(ws, "I13", role_name_map.get("Timer"))
     safe_set(ws, "I14", role_name_map.get("PC Manager (Vote Counter)"))
-
+    
     # Table Topics / Prepared Speech
     safe_set(ws, "I16", role_name_map.get("Table Topics Master"))
-
-    # Speech1..4（なければスキップ）
+    
+    # Speech1..4（存在しないキーは空＝スキップ）
     safe_set(ws, "E25", safe_quote(speech_title_map.get("Speech1")))
     safe_set(ws, "I25", speech_path_map.get("Speech1"))
     safe_set(ws, "I26", role_name_map.get("Speech1"))
-
+    
     safe_set(ws, "E27", safe_quote(speech_title_map.get("Speech2")))
     safe_set(ws, "I27", speech_path_map.get("Speech2"))
     safe_set(ws, "I28", role_name_map.get("Speech2"))
-
+    
     safe_set(ws, "E29", safe_quote(speech_title_map.get("Speech3")))
     safe_set(ws, "I29", speech_path_map.get("Speech3"))
     safe_set(ws, "I30", role_name_map.get("Speech3"))
-
+    
     safe_set(ws, "E31", safe_quote(speech_title_map.get("Speech4")))
     safe_set(ws, "I31", speech_path_map.get("Speech4"))
     safe_set(ws, "I32", role_name_map.get("Speech4"))
-
+    
     # GE, Evaluators（存在しないキーは空）
     safe_set(ws, "I37", role_name_map.get("General Evaluator"))
-
+    
     safe_set(ws, "E38", evaluator_map.get("Evaluator1"))
     safe_set(ws, "I38", role_name_map.get("Evaluator1"))
-
+    
     safe_set(ws, "E39", evaluator_map.get("Evaluator2"))
     safe_set(ws, "I39", role_name_map.get("Evaluator2"))
-
+    
     safe_set(ws, "E40", evaluator_map.get("Evaluator3"))
     safe_set(ws, "I40", role_name_map.get("Evaluator3"))
-
+    
     safe_set(ws, "E41", evaluator_map.get("Evaluator4"))
     safe_set(ws, "I41", role_name_map.get("Evaluator4"))
+    
+    # --- ここまで置き換え ---
 
     # レポート欄（Woe/Ah/Grammar）
     safe_set(ws, "I43", role_name_map.get("Word of the Evening"))
