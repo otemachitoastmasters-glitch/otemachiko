@@ -5,6 +5,8 @@ import subprocess
 from bs4 import BeautifulSoup
 from datetime import datetime
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.page import PageMargins
 
 # 画像は存在する場合のみ挿入（Pillow 必須）
 try:
@@ -12,7 +14,6 @@ try:
     PIL_OK = True
 except Exception:
     PIL_OK = False
-
 
 # -----------------------------
 # 共通: HTTPヘッダ（UA）
@@ -31,6 +32,36 @@ UA_MOBILE = {
         "Mobile/15E148 Safari/604.1"
     )
 }
+
+def apply_print_settings(ws):
+    # 1) 用紙＆向き
+    ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4   # A4
+    # A3にしたい場合は ↓
+    # ws.page_setup.paperSize = 8  # PAPERSIZE_A3 (openpyxlは定数が足りないため数値指定)
+
+    # 2) スケーリング：横1ページに収める
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
+    ws.page_setup.scale = None  # Fit設定を優先（念のため）
+
+    # 3) 余白（単位：インチ）
+    ws.page_margins = PageMargins(
+        left=0.2, right=0.2, top=0.3, bottom=0.3, header=0.2, footer=0.2
+    )
+
+    # 4) 印刷範囲を最終セルまで
+    max_row = ws.max_row
+    max_col = ws.max_column
+    last_col_letter = get_column_letter(max_col)
+    ws.print_area = f"A1:{last_col_letter}{max_row}"
+
+    # 5) （任意）テキストが長い列は折り返し有効化
+    #   例: E列とI列を折り返し
+    for col in ("E", "I"):
+        for r in range(1, max_row + 1):
+            cell = ws[f"{col}{r}"]
+            cell.alignment = (cell.alignment.copy(wrap_text=True))
 
 def convert_excel_to_pdf(excel_path, pdf_path):
     subprocess.run([
