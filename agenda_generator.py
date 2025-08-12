@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import subprocess
 from bs4 import BeautifulSoup
 from datetime import datetime
 from openpyxl import load_workbook
@@ -31,7 +32,15 @@ UA_MOBILE = {
     )
 }
 
-
+def convert_excel_to_pdf(excel_path, pdf_path):
+    subprocess.run([
+        "libreoffice",
+        "--headless",
+        "--convert-to", "pdf",
+        "--outdir", os.path.dirname(pdf_path),
+        excel_path
+    ], check=True)
+    
 # -----------------------------
 # 1) <a onclick="showDetail(n)"> の最初の n を返す
 #    （PC→モバイルの順で試す）
