@@ -4,6 +4,15 @@ import os
 
 app = Flask(__name__)
 
+@app.route("/generate-pdf/")
+def generate_pdf():
+    excel_path = generate_agenda_excel_from_url(...)
+    pdf_path = excel_path.replace(".xlsx", ".pdf")
+
+    convert_excel_to_pdf(excel_path, pdf_path)
+
+    return send_file(pdf_path, as_attachment=True)
+
 @app.route("/generate/")
 def generate_agenda():
 
