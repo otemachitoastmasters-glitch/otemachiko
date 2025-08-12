@@ -266,9 +266,9 @@ def generate_agenda_excel_from_url(
     safe_set(ws, "I43", role_name_map.get("Word of the Evening"))
     safe_set(ws, "I44", role_name_map.get("Ah-Counter"))
     safe_set(ws, "I45", role_name_map.get("Grammarian"))
-
-    # 保存
-    out = output_path or f"{meeting_title or 'Agenda'}_agenda.xlsx"
-    wb.save(out)
-    print(f"✅ Saved Excel to: {out}")
-    return out
+# 保存
+    output_path = meeting_title + "_agenda.xlsx"
+    wb.save(output_path)
+    print(f"✅ Saved Excel to: {output_path}")
+    
+    return output_path
