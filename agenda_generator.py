@@ -53,7 +53,7 @@ def apply_print_settings(ws):
     # 4) 印刷範囲を最終セルまで
     max_row = ws.max_row
     max_col = ws.max_column
-    last_col_letter = get_column_letter(max_col)
+    last_col_letter = "L" #get_column_letter(max_col)
     ws.print_area = f"A1:{last_col_letter}{max_row}"
 
     # 5) （任意）テキストが長い列は折り返し有効化
